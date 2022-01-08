@@ -1,6 +1,10 @@
 
 public strictfp class Add {
     public static void main(String[] args) {
+        int t; // Local Variable Has to be initalize first
+        // System.out.println(++t);
+        byte q = (byte) 130;
+        System.out.println(q);
         boolean att = true;
         char w1 = 'न';
         System.out.println(w1);
