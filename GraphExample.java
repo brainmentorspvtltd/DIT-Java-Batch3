@@ -1,5 +1,7 @@
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 class Vertex {
@@ -29,6 +31,69 @@ class Graph {
             neighbourVertex.neighbours.remove(vertexName);
         }
         allVertex.remove(vertexName);
+    }
+
+    boolean isPathExist(String startVertex, String reachVertex,
+            HashMap<String, Boolean> visitedMap) {
+        // Put the start vertex in map , marked as visited.
+        visitedMap.put(startVertex, true);
+        // Check there is direct edge b/w the startVertex and the reachVertex
+        if (isEdgeExist(startVertex, reachVertex)) {
+            return true;
+        }
+        // Neighbour Explore
+        Vertex one = allVertex.get(startVertex);
+        Set<String> neighbours = one.neighbours.keySet();
+        for (String key : neighbours) {
+            if (!visitedMap.containsKey(key) && isPathExist(key, reachVertex, visitedMap)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static class Pair {
+        String vertexName;
+        String processedTill; // Path till process
+    }
+
+    boolean bfs(String source, String target) {
+        // Define Visited Map
+        HashMap<String, Boolean> visitedMap = new HashMap<>();
+        // Maintain a Queue for Level Order (BFS)
+        Queue<Pair> queue = new LinkedList<>();
+        Pair pair = new Pair();
+        pair.vertexName = source;
+        pair.processedTill = source;
+        queue.add(pair);
+        while (!queue.isEmpty()) {
+            // Remove the queue first element
+            Pair p = queue.poll();
+            // if that vertex is already processed (Already visited)
+            if (visitedMap.containsKey(p.vertexName)) {
+                continue;
+            }
+            // If not visited so mark it
+            visitedMap.put(p.vertexName, true);
+            // is edge exist b/w source and target
+            if (isEdgeExist(p.vertexName, target)) {
+                // Vertex Found....
+                return true;
+            }
+            // there is no direct edge , explore the neighbour (p object)
+            Set<String> neighbours = allVertex.get(p.vertexName).neighbours.keySet();
+            for (String key : neighbours) {
+                // Check this neighbour is already visited or not
+                if (!visitedMap.containsKey(key)) {
+                    Pair newPair = new Pair();
+                    newPair.vertexName = key;
+                    newPair.processedTill = p.processedTill + key;
+                    queue.add(newPair);
+                }
+            }
+
+        }
+        return false;
     }
 
     void removeEdge(String firstVertex, String secondVertex) {
@@ -97,6 +162,9 @@ public class GraphExample {
         graph.addEdge("F", "G", 9);
         graph.addEdge("E", "G", 8);
         graph.print();
-
+        HashMap<String, Boolean> visitedMap = new HashMap<>();
+        boolean result = graph.isPathExist("A", "E", visitedMap);
+        System.out.println(result ? "Path Exist" : "Not Exist");
+        System.out.println(graph.bfs("A", "P") ? "Found " : "Not found...");
     }
 }
